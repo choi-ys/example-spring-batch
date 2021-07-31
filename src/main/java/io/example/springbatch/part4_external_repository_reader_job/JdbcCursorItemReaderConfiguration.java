@@ -1,4 +1,4 @@
-package io.example.springbatch.part4_custom_reader;
+package io.example.springbatch.part4_external_repository_reader_job;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,19 +41,19 @@ public class JdbcCursorItemReaderConfiguration {
     @Bean
     public Step jdbcCursorItemReaderStep() throws Exception {
         return stepBuilderFactory.get("jdbcCursorItemReaderStep")
-                .<Person, Person>chunk(10)
+                .<PersonDto, PersonDto>chunk(10)
                 .reader(jdbcCursorItemReader())
                 .writer(itemWriter())
                 .build();
     }
 
     private JdbcCursorItemReader jdbcCursorItemReader() throws Exception {
-        JdbcCursorItemReader<Person> personJdbcCursorItemReader = new JdbcCursorItemReaderBuilder<Person>()
+        JdbcCursorItemReader<PersonDto> personJdbcCursorItemReader = new JdbcCursorItemReaderBuilder<PersonDto>()
                 .name("jdbcCursorItemReader")
                 .dataSource(dataSource)
                 .sql("SELECT id, name, age, address FROM person_tb")
                 .rowMapper((resultSet, rowNum) ->
-                        new Person(
+                        new PersonDto(
                                 resultSet.getInt(1),
                                 resultSet.getString(2),
                                 resultSet.getInt(3),
@@ -65,9 +65,9 @@ public class JdbcCursorItemReaderConfiguration {
         return personJdbcCursorItemReader;
     }
 
-    private ItemWriter<Person> itemWriter() {
-        return items -> log.info(items.stream()
-                .map(Person::getName)
+    private ItemWriter<PersonDto> itemWriter() {
+        return items -> log.info("Result : {}", items.stream()
+                .map(PersonDto::getName)
                 .collect(Collectors.joining(", "))
         );
     }

@@ -1,4 +1,4 @@
-package io.example.springbatch.part4_custom_reader;
+package io.example.springbatch.part4_external_repository_reader_job;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,24 +39,24 @@ public class JavaObjectItemReaderConfiguration {
     @Bean
     public Step javaObjectItemReaderStep() {
         return stepBuilderFactory.get("javaObjectItemReaderStep")
-                .<Person, Person>chunk(10)
+                .<PersonDto, PersonDto>chunk(10)
                 .reader(new CustomItemReader<>(getItem()))
                 .writer(itemWriter())
                 .build();
     }
 
-    private ItemWriter<Person> itemWriter() {
-        return items -> log.info(items.stream()
-                .map(Person::getName)
+    private ItemWriter<PersonDto> itemWriter() {
+        return items -> log.info("Result : {}", items.stream()
+                .map(PersonDto::getName)
                 .collect(Collectors.joining(", "))
         );
     }
 
-    private List<Person> getItem() {
-        List<Person> items = new ArrayList<>();
+    private List<PersonDto> getItem() {
+        List<PersonDto> items = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
-            items.add(new Person(i+1, "test name" + i, i+30, "test address"));
+            items.add(new PersonDto(i+1, "test name" + i, i+30, "test address"));
         }
         return items;
     }

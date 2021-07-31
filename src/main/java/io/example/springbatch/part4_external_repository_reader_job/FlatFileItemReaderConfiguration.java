@@ -1,4 +1,4 @@
-package io.example.springbatch.part4_custom_reader;
+package io.example.springbatch.part4_external_repository_reader_job;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,15 +42,15 @@ public class FlatFileItemReaderConfiguration {
     @Bean
     public Step flatFileItemReaderStep() throws Exception {
         return stepBuilderFactory.get("flatFileItemReaderStep")
-                .<Person, Person>chunk(3)
+                .<PersonDto, PersonDto>chunk(3)
                 .reader(this.csvFileItemReader())
                 .writer(itemWriter())
                 .build();
     }
 
-    private DefaultLineMapper<Person> getPersonDefaultLineMapper() {
+    private DefaultLineMapper<PersonDto> getPersonDefaultLineMapper() {
         // csv 파일을 1줄씩 읽어 대상 객체와 매핑하는 Mapper
-        DefaultLineMapper<Person> personDefaultLineMapper = new DefaultLineMapper<Person>();
+        DefaultLineMapper<PersonDto> personDefaultLineMapper = new DefaultLineMapper<PersonDto>();
 
         // csv 파일과의 항목과 매핑할 객체의 필드를 설정하기 위한 Tokenizer
         DelimitedLineTokenizer delimitedLineTokenizer = new DelimitedLineTokenizer();
@@ -65,13 +65,13 @@ public class FlatFileItemReaderConfiguration {
             int age = fieldSet.readInt("age");
             String address = fieldSet.readString("address");
 
-            return new Person(id, name, age, address);
+            return new PersonDto(id, name, age, address);
         });
         return personDefaultLineMapper;
     }
 
-    private FlatFileItemReader<Person> csvFileItemReader() throws Exception {
-        FlatFileItemReader<Person> csvFileItemReader = new FlatFileItemReaderBuilder<Person>()
+    private FlatFileItemReader<PersonDto> csvFileItemReader() throws Exception {
+        FlatFileItemReader<PersonDto> csvFileItemReader = new FlatFileItemReaderBuilder<PersonDto>()
                 .name("csvFileItemReader")
                 .encoding("UTF-8")
                 .resource(new ClassPathResource("test.csv"))
@@ -83,9 +83,9 @@ public class FlatFileItemReaderConfiguration {
         return csvFileItemReader;
     }
 
-    private ItemWriter<Person> itemWriter() {
-        return items -> log.info(items.stream()
-                .map(Person::getName)
+    private ItemWriter<PersonDto> itemWriter() {
+        return items -> log.info("Result : {}", items.stream()
+                .map(PersonDto::getName)
                 .collect(Collectors.joining(", "))
         );
     }

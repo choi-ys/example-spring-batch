@@ -1,4 +1,4 @@
-package io.example.springbatch.part4_custom_reader;
+package io.example.springbatch.part4_external_repository_reader_job;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.NonTransientResourceException;

@@ -1,4 +1,4 @@
-package io.example.springbatch.part4_custom_reader;
+package io.example.springbatch.part4_external_repository_reader_job;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,20 +46,20 @@ public class JdbcPagingItemReaderConfiguration {
     @Bean
     public Step jdbcPagingItemReaderStep() throws Exception {
         return stepBuilderFactory.get("jdbcPagingItemReaderStep")
-                .<Person, Person>chunk(10)
+                .<PersonDto, PersonDto>chunk(4)
                 .reader(jdbcPagingItemReader())
                 .writer(itemWriter())
                 .build();
     }
 
     private JdbcPagingItemReader jdbcPagingItemReader() throws Exception {
-        JdbcPagingItemReader<Person> personJdbcPagingItemReader = new JdbcPagingItemReaderBuilder<Person>()
+        JdbcPagingItemReader<PersonDto> personJdbcPagingItemReader = new JdbcPagingItemReaderBuilder<PersonDto>()
                 .pageSize(3) // 가져올 row 수
                 .fetchSize(2)
                 .name("jdbcPagingItemReader")
                 .dataSource(dataSource)
                 .rowMapper((resultSet, rowNum) ->
-                        new Person(
+                        new PersonDto(
                                 resultSet.getInt(1),
                                 resultSet.getString(2),
                                 resultSet.getInt(3),
@@ -87,9 +87,9 @@ public class JdbcPagingItemReaderConfiguration {
         return queryProvider.getObject();
     }
 
-    private ItemWriter<Person> itemWriter() {
-        return items -> log.info(items.stream()
-                .map(Person::getName)
+    private ItemWriter<PersonDto> itemWriter() {
+        return items -> log.info("Result : {}", items.stream()
+                .map(PersonDto::getName)
                 .collect(Collectors.joining(", "))
         );
     }

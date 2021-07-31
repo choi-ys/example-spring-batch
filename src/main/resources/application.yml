@@ -1,9 +1,20 @@
 spring:
+  profiles:
+    active: h2
+
   batch:
     job:
       names: ${custom.job.name:NONE}
-  profiles:
-    active: h2
+
+  sql:
+    init:
+      data-locations: classpath:person.sql
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
 logging:
   level:
     root: info
@@ -12,4 +23,4 @@ logging:
         jdbc:
           core:
             JdbcTemplate: debug
-            StatementCreatorUtils: trace
+#            StatementCreatorUtils: trace
