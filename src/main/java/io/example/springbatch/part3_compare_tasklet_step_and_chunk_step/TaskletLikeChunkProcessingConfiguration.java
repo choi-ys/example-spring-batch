@@ -3,6 +3,7 @@ package io.example.springbatch.part3_compare_tasklet_step_and_chunk_step;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -12,6 +13,7 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,19 +49,25 @@ public class TaskletLikeChunkProcessingConfiguration {
         List<String> items = getItems();
         return ((contribution, chunkContext) -> {
             StepExecution stepExecution = contribution.getStepExecution();
+            JobParameters jobParameters = stepExecution.getJobParameters();
 
-            int chunkSize = 50;
+            String jobName = stepExecution.getJobExecution().getJobInstance().getJobName();
+            String stepName = stepExecution.getStepName();
+
+            String value = jobParameters.getString("chunkSize", "10");
+            int chunkSize = StringUtils.hasText(value) ? Integer.parseInt(value) : 10;
             int fromIndex = stepExecution.getReadCount();
-            int toIndex = fromIndex + chunkSize;
+            int nextIndex = fromIndex + chunkSize;
+            int toIndex = nextIndex < items.size() ? nextIndex : items.size();
 
             if(fromIndex >= items.size()){
                 return RepeatStatus.FINISHED;
             }
 
-            List<String> subList = items.subList(fromIndex, toIndex);
+            items.subList(fromIndex, toIndex);
             stepExecution.setReadCount(toIndex);
 
-            log.info("chunkSize : {}, fromIndex : {}, toIndex : {}", chunkSize, fromIndex, toIndex);
+            log.info("[{} : {}] chunkSize : {}, fromIndex : {}, toIndex : {}", jobName, stepName, chunkSize, fromIndex, toIndex);
             return RepeatStatus.CONTINUABLE;
         });
     }

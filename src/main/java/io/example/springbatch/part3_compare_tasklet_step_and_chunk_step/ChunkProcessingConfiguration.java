@@ -5,14 +5,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,19 +37,20 @@ public class ChunkProcessingConfiguration {
     public Job chunkProcessingJob(){
         return jobBuilderFactory.get("chunkProcessingJob")
                 .incrementer(new RunIdIncrementer())
-                .start(this.chunkBaseStep())
+                .start(this.chunkBaseStep(null))
                 .build();
     }
 
     @Bean
-    public Step chunkBaseStep() {
+    @JobScope
+    public Step chunkBaseStep(@Value("#{jobParameters[chunkSize]}") String value) {
         return stepBuilderFactory.get("chunkBaseStep")
                 /**
                  * <I, O> SimpleStepBuilder<I, O> chunk(int chunkSize)
                  *  - I : ItemReader에서 조회 후 반환된 Input Type
                  *  - O : ItemProcessor에서 읽어서 반환하는 Output Type
                  */
-                .<String, String>chunk(10) // chunkSize -> 매 회 chunk Step이 처리 하는 items 개수
+                .<String, String>chunk(StringUtils.hasText(value) ? Integer.parseInt(value) : 29) // chunkSize -> 매 회 chunk Step이 처리 하는 items 개수
                 .reader(itemReader())
                 .processor(itemProcessor())
                 .writer(itemWriter())
@@ -75,7 +79,8 @@ public class ChunkProcessingConfiguration {
      * @return
      */
     private ItemWriter<String> itemWriter() {
-        return items -> items.forEach(log::info);
+        return items -> log.info("chunk item size : {}", items.size());
+//        return items -> items.forEach(log::info);
     }
 
     private List<String> getItems() {
