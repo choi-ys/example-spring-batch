@@ -8,9 +8,11 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
@@ -41,20 +43,19 @@ public class TaskletLikeChunkProcessingConfiguration {
 
     private Step taskBaseStep() {
         return stepBuilderFactory.get("taskBaseStep")
-                .tasklet(this.tasklet())
+                .tasklet(this.tasklet(null))
                 .build();
     }
 
-    private Tasklet tasklet() {
+    @StepScope
+    private Tasklet tasklet(@Value("#{jobParameters[chunkSize]}") String value) {
         List<String> items = getItems();
         return ((contribution, chunkContext) -> {
             StepExecution stepExecution = contribution.getStepExecution();
-            JobParameters jobParameters = stepExecution.getJobParameters();
 
             String jobName = stepExecution.getJobExecution().getJobInstance().getJobName();
             String stepName = stepExecution.getStepName();
 
-            String value = jobParameters.getString("chunkSize", "10");
             int chunkSize = StringUtils.hasText(value) ? Integer.parseInt(value) : 10;
             int fromIndex = stepExecution.getReadCount();
             int nextIndex = fromIndex + chunkSize;
