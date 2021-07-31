@@ -1,4 +1,4 @@
-package io.example.springbatch.part4_custom_reader_with_pojo;
+package io.example.springbatch.part4_custom_reader;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,22 +23,22 @@ import java.util.stream.Collectors;
 @Configuration
 @Slf4j
 @RequiredArgsConstructor
-public class CustomItemReaderConfiguration {
+public class JavaObjectItemReaderConfiguration {
 
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
 
     @Bean
-    public Job itemReaderJob() {
-        return jobBuilderFactory.get("itemReaderJob")
+    public Job javaItemReaderJob() {
+        return jobBuilderFactory.get("javaItemReaderJob")
                 .incrementer(new RunIdIncrementer())
-                .start(this.customItemReaderStep())
+                .start(this.javaObjectItemReaderStep())
                 .build();
     }
 
     @Bean
-    public Step customItemReaderStep() {
-        return stepBuilderFactory.get("customItemReaderStep")
+    public Step javaObjectItemReaderStep() {
+        return stepBuilderFactory.get("javaObjectItemReaderStep")
                 .<Person, Person>chunk(10)
                 .reader(new CustomItemReader<>(getItem()))
                 .writer(itemWriter())
@@ -60,6 +60,4 @@ public class CustomItemReaderConfiguration {
         }
         return items;
     }
-
-
 }

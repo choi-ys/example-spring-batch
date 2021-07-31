@@ -1,4 +1,4 @@
-package io.example.springbatch.part4_custom_reader_with_pojo;
+package io.example.springbatch.part4_custom_reader;
 
 import lombok.Getter;
 
