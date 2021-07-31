@@ -1,4 +1,4 @@
-package io.example.springbatch.part3;
+package io.example.springbatch.part3_compare_tasklet_step_and_chunk_step;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +29,8 @@ public class TaskletProcessingConfiguration {
     private final StepBuilderFactory stepBuilderFactory;
 
     @Bean
-    public Job taskProcessingJob(){
-        return jobBuilderFactory.get("taskProcessingJob")
+    public Job taskletProcessingJob(){
+        return jobBuilderFactory.get("taskletProcessingJob")
                 .incrementer(new RunIdIncrementer())
                 .start(this.taskBaseStep())
                 .build();
