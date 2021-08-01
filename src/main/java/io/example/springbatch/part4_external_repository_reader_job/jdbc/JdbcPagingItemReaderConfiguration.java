@@ -89,11 +89,4 @@ public class JdbcPagingItemReaderConfiguration {
 
         return queryProvider.getObject();
     }
-
-    private ItemWriter<PersonDto> itemWriter() {
-        return items -> log.info("Result : {}", items.stream()
-                .map(PersonDto::getName)
-                .collect(Collectors.joining(", "))
-        );
-    }
 }

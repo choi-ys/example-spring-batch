@@ -1,7 +1,6 @@
 package io.example.springbatch.part4_external_repository_reader_job.repository;
 
 import io.example.springbatch.part4_external_repository_reader_job.domain.PersonEntity;
-import io.example.springbatch.part4_external_repository_reader_job.repository.PersonEntityRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -9,7 +8,6 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.data.RepositoryItemReader;
 import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +15,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Sort;
 
 import java.util.Collections;
-import java.util.stream.Collectors;
+
+import static io.example.springbatch.part4_external_repository_reader_job.PersonItemWriter.personEntityItemWriter;
 
 /**
  * @author : arura
@@ -46,7 +45,7 @@ public class RepositoryItemReaderConfiguration {
         return stepBuilderFactory.get("repositoryItemReaderStep")
                 .<PersonEntity, PersonEntity>chunk(2)
                 .reader(repositoryItemReader())
-                .writer(itemWriter())
+                .writer(personEntityItemWriter())
                 .build();
     }
 
@@ -62,12 +61,5 @@ public class RepositoryItemReaderConfiguration {
                 .build();
         personEntityRepositoryItemReader.afterPropertiesSet();
         return personEntityRepositoryItemReader;
-    }
-
-    private ItemWriter<PersonEntity> itemWriter() {
-        return items -> log.info("Result : {}", items.stream()
-                .map(PersonEntity::getName)
-                .collect(Collectors.joining(", "))
-        );
     }
 }
