@@ -1,5 +1,6 @@
-package io.example.springbatch.part4_external_repository_reader_job;
+package io.example.springbatch.part4_external_repository_reader_job.jpa;
 
+import io.example.springbatch.part4_external_repository_reader_job.domain.PersonEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;

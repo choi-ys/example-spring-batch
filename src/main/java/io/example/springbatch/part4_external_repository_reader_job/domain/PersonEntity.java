@@ -1,4 +1,4 @@
-package io.example.springbatch.part4_external_repository_reader_job;
+package io.example.springbatch.part4_external_repository_reader_job.domain;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

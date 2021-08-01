@@ -1,5 +1,6 @@
-package io.example.springbatch.part4_external_repository_reader_job;
+package io.example.springbatch.part4_external_repository_reader_job.repository;
 
+import io.example.springbatch.part4_external_repository_reader_job.domain.PersonEntity;
 import io.example.springbatch.part4_external_repository_reader_job.repository.PersonEntityRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
