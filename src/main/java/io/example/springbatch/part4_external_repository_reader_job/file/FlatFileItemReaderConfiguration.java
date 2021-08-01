@@ -19,6 +19,8 @@ import org.springframework.core.io.ClassPathResource;
 
 import java.util.stream.Collectors;
 
+import static io.example.springbatch.part4_external_repository_reader_job.PersonItemWriter.personDtoItemWriter;
+
 /**
  * @author : arura
  * @date : 2021-08-01 오전 2:50
@@ -45,7 +47,7 @@ public class FlatFileItemReaderConfiguration {
         return stepBuilderFactory.get("flatFileItemReaderStep")
                 .<PersonDto, PersonDto>chunk(3)
                 .reader(this.csvFileItemReader())
-                .writer(itemWriter())
+                .writer(personDtoItemWriter())
                 .build();
     }
 
@@ -82,12 +84,5 @@ public class FlatFileItemReaderConfiguration {
 
         csvFileItemReader.afterPropertiesSet(); // ItemReader에 필요한 필수 설정값을 검증
         return csvFileItemReader;
-    }
-
-    private ItemWriter<PersonDto> itemWriter() {
-        return items -> log.info("Result : {}", items.stream()
-                .map(PersonDto::getName)
-                .collect(Collectors.joining(", "))
-        );
     }
 }

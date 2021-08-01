@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static io.example.springbatch.part4_external_repository_reader_job.PersonItemWriter.personDtoItemWriter;
+
 /**
  * @author : arura
  * @date : 2021-08-01 오전 3:33
@@ -49,7 +51,7 @@ public class JdbcPagingItemReaderConfiguration {
         return stepBuilderFactory.get("jdbcPagingItemReaderStep")
                 .<PersonDto, PersonDto>chunk(4)
                 .reader(jdbcPagingItemReader())
-                .writer(itemWriter())
+                .writer(personDtoItemWriter())
                 .build();
     }
 

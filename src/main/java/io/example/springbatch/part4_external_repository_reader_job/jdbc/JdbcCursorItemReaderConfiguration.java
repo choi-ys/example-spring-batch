@@ -8,14 +8,14 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.sql.DataSource;
-import java.util.stream.Collectors;
+
+import static io.example.springbatch.part4_external_repository_reader_job.PersonItemWriter.personDtoItemWriter;
 
 /**
  * @author : arura
@@ -44,7 +44,7 @@ public class JdbcCursorItemReaderConfiguration {
         return stepBuilderFactory.get("jdbcCursorItemReaderStep")
                 .<PersonDto, PersonDto>chunk(10)
                 .reader(jdbcCursorItemReader())
-                .writer(itemWriter())
+                .writer(personDtoItemWriter())
                 .build();
     }
 
@@ -64,12 +64,5 @@ public class JdbcCursorItemReaderConfiguration {
                 .build();
         personJdbcCursorItemReader.afterPropertiesSet();
         return personJdbcCursorItemReader;
-    }
-
-    private ItemWriter<PersonDto> itemWriter() {
-        return items -> log.info("Result : {}", items.stream()
-                .map(PersonDto::getName)
-                .collect(Collectors.joining(", "))
-        );
     }
 }

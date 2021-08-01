@@ -8,14 +8,14 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.persistence.EntityManagerFactory;
 import java.util.HashMap;
-import java.util.stream.Collectors;
+
+import static io.example.springbatch.part4_external_repository_reader_job.PersonItemWriter.personEntityItemWriter;
 
 /**
  * @author : arura
@@ -44,7 +44,7 @@ public class JpaPagingItemReaderConfiguration {
         return stepBuilderFactory.get("jpaPagingItemReaderStep")
                 .<PersonEntity, PersonEntity>chunk(2)
                 .reader(jpaPagingItemReader())
-                .writer(itemWriter())
+                .writer(personEntityItemWriter())
                 .build();
     }
 
@@ -59,12 +59,5 @@ public class JpaPagingItemReaderConfiguration {
         jpaPagingItemReader.setEntityManagerFactory(entityManagerFactory);
         jpaPagingItemReader.setPageSize(2);
         return jpaPagingItemReader;
-    }
-
-    private ItemWriter<PersonEntity> itemWriter() {
-        return items -> log.info("Result : {}", items.stream()
-                .map(PersonEntity::getName)
-                .collect(Collectors.joining(", "))
-        );
     }
 }
